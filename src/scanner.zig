@@ -404,14 +404,14 @@ const Protocol = struct {
         if (protocol.copyright) |copyright| {
             var it = mem.split(u8, copyright, "\n");
             while (it.next()) |line| {
-                try writer.print("// {s}\n", .{mem.trim(u8, line, &std.ascii.spaces)});
+                try writer.print("// {s}\n", .{mem.trim(u8, line, &std.ascii.whitespace)});
             }
             try writer.writeByte('\n');
         }
         if (protocol.toplevel_description) |toplevel_description| {
             var it = mem.split(u8, toplevel_description, "\n");
             while (it.next()) |line| {
-                try writer.print("// {s}\n", .{mem.trim(u8, line, &std.ascii.spaces)});
+                try writer.print("// {s}\n", .{mem.trim(u8, line, &std.ascii.whitespace)});
             }
             try writer.writeByte('\n');
         }
@@ -612,7 +612,7 @@ const Interface = struct {
             }
 
             var has_destroy = false;
-            for (interface.requests) |request, opcode| {
+            for (interface.requests, 0..) |request, opcode| {
                 if (request.since <= target_version) {
                     if (mem.eql(u8, request.name, "destroy")) has_destroy = true;
                     try request.emitFn(side, writer, interface, opcode);
@@ -706,7 +706,7 @@ const Interface = struct {
                     \\        @intToPtr(?*anyopaque, @ptrToInt(_data)),
                     \\        if (handle_destroy) |_handler| struct {{
                     \\            fn _wrapper(__resource: *server.wl.Resource) callconv(.C) void {{
-                    \\                @call(.{{ .modifier = .always_inline }}, _handler, .{{
+                    \\                @call(.always_inline, _handler, .{{
                     \\                    @ptrCast(*{[type]}, __resource),
                     \\                    @intToPtr(T, @ptrToInt(__resource.getUserData())),
                     \\                }});
@@ -733,7 +733,7 @@ const Interface = struct {
                     \\        @intToPtr(?*anyopaque, @ptrToInt(_data)),
                     \\        if (handle_destroy) |_handler| struct {{
                     \\            fn _wrapper(__resource: *server.wl.Resource) callconv(.C) void {{
-                    \\                @call(.{{ .modifier = .always_inline }}, _handler, .{{
+                    \\                @call(.always_inline, _handler, .{{
                     \\                    @ptrCast(*{[type]}, __resource),
                     \\                    @intToPtr(T, @ptrToInt(__resource.getUserData())),
                     \\                }});
@@ -747,7 +747,7 @@ const Interface = struct {
                 });
             }
 
-            for (interface.events) |event, opcode| {
+            for (interface.events, 0..) |event, opcode| {
                 if (event.since <= target_version) {
                     try event.emitFn(side, writer, interface, opcode);
                 }
