@@ -94,7 +94,7 @@ pub fn Dispatcher(comptime Obj: type, comptime Data: type) type {
                                 // objects, strings, arrays
                                 .Pointer, .Optional => @field(payload_data, f.name) = @intToPtr(f.type, @ptrToInt(args[i].o)),
                                 // non-bitfield enums
-                                .Enum => @field(payload_data, f.name) = @intToEnum(f.field_type, args[i].i),
+                                .Enum => @field(payload_data, f.name) = @intToEnum(f.type, args[i].i),
                                 else => unreachable,
                             }
                         }
