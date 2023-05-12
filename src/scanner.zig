@@ -29,7 +29,7 @@ pub fn scan(
     protocols: []const []const u8,
     targets: []const Target,
 ) !void {
-    defer assert(!general_purpose_allocator.deinit());
+    defer assert(general_purpose_allocator.deinit() == .ok);
 
     const wayland_file = try out_dir.createFile("wayland.zig", .{});
     try wayland_file.writeAll(
